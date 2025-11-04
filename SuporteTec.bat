@@ -3,10 +3,15 @@ chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 color 0A
 mode con cols=100 lines=40
-title ERROR KILLER - Ferramenta de Suporte Diagonal
+title MENU- Ferramenta de Suporte Diagonal
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value 2^>nul') do set datetime=%%I
 set LOGFILE=%TEMP%\error_killer_%datetime:~0,8%.txt
+
+:: Configuração da pasta de programas
+set "PASTA_PROGRAMAS=C:\Programas"
+set "PROGRAMAS_INSTALADOS=0"
+set "PROGRAMAS_PULADOS=0"
 
 :menu
 cls
@@ -47,6 +52,29 @@ echo  ================================================================
 echo                 INSTALACAO AUTOMATICA DE PROGRAMAS
 echo  ================================================================
 echo.
+echo  Pasta de instaladores: %PASTA_PROGRAMAS%
+echo.
+
+:: Verifica se a pasta existe
+if not exist "%PASTA_PROGRAMAS%" (
+    echo  [AVISO] Pasta de programas nao encontrada!
+    echo  Crie a pasta: %PASTA_PROGRAMAS%
+    echo  e adicione os instaladores.
+    echo.
+    echo  [1] Criar pasta agora
+    echo  [0] Voltar
+    echo.
+    set /p criar_pasta= Escolha: 
+    if "!criar_pasta!"=="1" (
+        mkdir "%PASTA_PROGRAMAS%" >nul 2>&1
+        echo  [+] Pasta criada: %PASTA_PROGRAMAS%
+        echo  [*] Adicione os instaladores e execute novamente.
+        pause
+        start "" "%PASTA_PROGRAMAS%"
+    )
+    goto menu
+)
+
 echo  [1]  Parallels Desktop
 echo  [2]  Google Chrome
 echo  [3]  GoTo Meeting
@@ -60,12 +88,14 @@ echo  [10] Foxit PDF Reader
 echo  [11] Microsoft Office 365
 echo.
 echo  [A]  INSTALAR TODOS OS PROGRAMAS
+echo  [V]  VERIFICAR INSTALADORES
 echo  [0]  VOLTAR
 echo  ================================================================
 echo.
 set /p escolha= Selecione os programas: 
 
 if /i "%escolha%"=="A" goto instalar_todos
+if /i "%escolha%"=="V" goto verificar_instaladores
 if "%escolha%"=="1" goto instalar_parallels
 if "%escolha%"=="2" goto instalar_chrome
 if "%escolha%"=="3" goto instalar_goto
@@ -84,6 +114,90 @@ echo  [ERRO] Opcao invalida!
 timeout /t 2 >nul
 goto programas
 
+:verificar_instaladores
+cls
+echo.
+echo  ================================================================
+echo               VERIFICACAO DE INSTALADORES NA PASTA
+echo  ================================================================
+echo.
+echo  Pasta: %PASTA_PROGRAMAS%
+echo.
+
+set "ENCONTRADOS=0"
+echo  Procurando instaladores...
+echo.
+
+:: Procura por arquivos comuns de instalacao
+for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" (
+    echo  [✓] Parallels: %%~nxF
+    set "PARALLELS_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*chrome*") do if exist "%%F" (
+    echo  [✓] Chrome: %%~nxF
+    set "CHROME_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*goto*") do if exist "%%F" (
+    echo  [✓] GoTo: %%~nxF
+    set "GOTO_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*7z*") do if exist "%%F" (
+    echo  [✓] 7-Zip: %%~nxF
+    set "7ZIP_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*anydesk*") do if exist "%%F" (
+    echo  [✓] AnyDesk: %%~nxF
+    set "ANYDESK_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*ndd*") do if exist "%%F" (
+    echo  [✓] NDD: %%~nxF
+    set "NDD_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*teams*") do if exist "%%F" (
+    echo  [✓] Teams: %%~nxF
+    set "TEAMS_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*java*") do if exist "%%F" (
+    echo  [✓] Java: %%~nxF
+    set "JAVA_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*forti*") do if exist "%%F" (
+    echo  [✓] FortiClient: %%~nxF
+    set "FORTI_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*foxit*") do if exist "%%F" (
+    echo  [✓] Foxit: %%~nxF
+    set "FOXIT_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+for %%F in ("%PASTA_PROGRAMAS%\*office*") do if exist "%%F" (
+    echo  [✓] Office: %%~nxF
+    set "OFFICE_FILE=%%F"
+    set /a ENCONTRADOS+=1
+)
+
+echo.
+echo  ================================================================
+echo  Total de instaladores encontrados: !ENCONTRADOS! / 11
+echo  ================================================================
+echo.
+if !ENCONTRADOS! equ 0 (
+    echo  [AVISO] Nenhum instalador encontrado!
+    echo  Coloque os arquivos na pasta: %PASTA_PROGRAMAS%
+)
+echo.
+pause
+goto programas
+
 :instalar_todos
 cls
 echo.
@@ -91,6 +205,11 @@ echo  ================================================================
 echo          INSTALANDO TODOS OS PROGRAMAS AUTOMATICAMENTE
 echo  ================================================================
 echo.
+echo  Pasta de instaladores: %PASTA_PROGRAMAS%
+echo.
+set "PROGRAMAS_INSTALADOS=0"
+set "PROGRAMAS_PULADOS=0"
+
 echo  [*] Iniciando instalacao completa...
 echo.
 call :instalar_parallels
@@ -104,9 +223,14 @@ call :instalar_java
 call :instalar_forticlient
 call :instalar_foxit
 call :instalar_office
+
 echo.
 echo  ================================================================
-echo         INSTALACAO CONCLUIDA - VERIFIQUE O LOG ACIMA
+echo                    RESUMO DA INSTALACAO
+echo  ================================================================
+echo  Programas instalados: !PROGRAMAS_INSTALADOS!
+echo  Programas pulados: !PROGRAMAS_PULADOS!
+echo  Total processado: 11
 echo  ================================================================
 echo.
 pause
@@ -117,11 +241,20 @@ echo [1/11] Verificando Parallels Desktop...
 reg query "HKLM\SOFTWARE\Parallels" >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Parallels ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Parallels Desktop...
-REM Aqui viria o comando de instalacao do Parallels
+if not defined PARALLELS_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" set "PARALLELS_FILE=%%F"
+)
+if not defined PARALLELS_FILE (
+    echo     [X] Instalador do Parallels nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Parallels Desktop: !PARALLELS_FILE!
+start "" /wait "!PARALLELS_FILE!" /quiet /norestart
 echo     [+] Parallels Desktop instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_chrome
@@ -129,11 +262,20 @@ echo [2/11] Verificando Google Chrome...
 reg query "HKLM\SOFTWARE\Google\Chrome" >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Chrome ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Google Chrome...
-PowerShell -Command "Start-Process 'https://dl.google.com/chrome/install/latest/chrome_installer.exe' -Wait" 2>nul
+if not defined CHROME_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*chrome*") do if exist "%%F" set "CHROME_FILE=%%F"
+)
+if not defined CHROME_FILE (
+    echo     [X] Instalador do Chrome nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Google Chrome: !CHROME_FILE!
+start "" /wait "!CHROME_FILE!" /silent /install
 echo     [+] Google Chrome instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_goto
@@ -141,11 +283,20 @@ echo [3/11] Verificando GoTo Meeting...
 where gotomeeting >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] GoTo Meeting ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando GoTo Meeting...
-REM Aqui viria o comando de instalacao do GoTo
+if not defined GOTO_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*goto*") do if exist "%%F" set "GOTO_FILE=%%F"
+)
+if not defined GOTO_FILE (
+    echo     [X] Instalador do GoTo nao encontrado
+    goto :eof
+)
+echo     [*] Instalando GoTo Meeting: !GOTO_FILE!
+start "" /wait "!GOTO_FILE!" /S
 echo     [+] GoTo Meeting instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_7zip
@@ -153,11 +304,20 @@ echo [4/11] Verificando 7-Zip...
 where 7z >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] 7-Zip ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando 7-Zip...
-PowerShell -Command "Invoke-WebRequest -Uri 'https://www.7-zip.org/a/7z2401-x64.exe' -OutFile '$env:TEMP\7zip.exe'; Start-Process '$env:TEMP\7zip.exe' '/S' -Wait" 2>nul
+if not defined 7ZIP_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*7z*") do if exist "%%F" set "7ZIP_FILE=%%F"
+)
+if not defined 7ZIP_FILE (
+    echo     [X] Instalador do 7-Zip nao encontrado
+    goto :eof
+)
+echo     [*] Instalando 7-Zip: !7ZIP_FILE!
+start "" /wait "!7ZIP_FILE!" /S
 echo     [+] 7-Zip instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_anydesk
@@ -165,11 +325,20 @@ echo [5/11] Verificando AnyDesk...
 where anydesk >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] AnyDesk ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando AnyDesk...
-REM Aqui viria o comando de instalacao do AnyDesk
+if not defined ANYDESK_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*anydesk*") do if exist "%%F" set "ANYDESK_FILE=%%F"
+)
+if not defined ANYDESK_FILE (
+    echo     [X] Instalador do AnyDesk nao encontrado
+    goto :eof
+)
+echo     [*] Instalando AnyDesk: !ANYDESK_FILE!
+start "" /wait "!ANYDESK_FILE!" --install "C:\Program Files (x86)\AnyDesk" --start-with-win --silent
 echo     [+] AnyDesk instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_ndd
@@ -177,11 +346,20 @@ echo [6/11] Verificando NDD Print Agent...
 where nddPrintAgent >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] NDD Print Agent ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando NDD Print Agent...
-REM Aqui viria o comando de instalacao do NDD
+if not defined NDD_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*ndd*") do if exist "%%F" set "NDD_FILE=%%F"
+)
+if not defined NDD_FILE (
+    echo     [X] Instalador do NDD nao encontrado
+    goto :eof
+)
+echo     [*] Instalando NDD Print Agent: !NDD_FILE!
+start "" /wait "!NDD_FILE!" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
 echo     [+] NDD Print Agent instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_teams
@@ -189,11 +367,20 @@ echo [7/11] Verificando Microsoft Teams...
 where teams >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Teams ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Microsoft Teams...
-PowerShell -Command "Invoke-WebRequest -Uri 'https://teams.microsoft.com/downloads/desktopurl?env=production&plat=windows&arch=x64&download=true' -OutFile '$env:TEMP\Teams.exe'; Start-Process '$env:TEMP\Teams.exe' '-s' -Wait" 2>nul
+if not defined TEAMS_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*teams*") do if exist "%%F" set "TEAMS_FILE=%%F"
+)
+if not defined TEAMS_FILE (
+    echo     [X] Instalador do Teams nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Microsoft Teams: !TEAMS_FILE!
+start "" /wait "!TEAMS_FILE!" -s
 echo     [+] Microsoft Teams instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_java
@@ -201,11 +388,20 @@ echo [8/11] Verificando Java Runtime...
 where java >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Java ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Java Runtime...
-REM Aqui viria o comando de instalacao do Java
+if not defined JAVA_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*java*") do if exist "%%F" set "JAVA_FILE=%%F"
+)
+if not defined JAVA_FILE (
+    echo     [X] Instalador do Java nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Java Runtime: !JAVA_FILE!
+start "" /wait "!JAVA_FILE!" /s INSTALL_SILENT=1 AUTO_UPDATE=0
 echo     [+] Java Runtime instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_forticlient
@@ -213,11 +409,20 @@ echo [9/11] Verificando FortiClient VPN...
 where forticlient >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] FortiClient ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando FortiClient VPN...
-REM Aqui viria o comando de instalacao do FortiClient
+if not defined FORTI_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*forti*") do if exist "%%F" set "FORTI_FILE=%%F"
+)
+if not defined FORTI_FILE (
+    echo     [X] Instalador do FortiClient nao encontrado
+    goto :eof
+)
+echo     [*] Instalando FortiClient VPN: !FORTI_FILE!
+start "" /wait "!FORTI_FILE!" /quiet /norestart
 echo     [+] FortiClient VPN instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_foxit
@@ -225,11 +430,20 @@ echo [10/11] Verificando Foxit PDF Reader...
 where foxitreader >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Foxit PDF Reader ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Foxit PDF Reader...
-REM Aqui viria o comando de instalacao do Foxit
+if not defined FOXIT_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*foxit*") do if exist "%%F" set "FOXIT_FILE=%%F"
+)
+if not defined FOXIT_FILE (
+    echo     [X] Instalador do Foxit nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Foxit PDF Reader: !FOXIT_FILE!
+start "" /wait "!FOXIT_FILE!" /quiet
 echo     [+] Foxit PDF Reader instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :instalar_office
@@ -237,11 +451,20 @@ echo [11/11] Verificando Office 365...
 reg query "HKLM\SOFTWARE\Microsoft\Office\16.0\Common\InstallRoot" >nul 2>&1
 if %errorlevel% equ 0 (
     echo     [!] Office 365 ja esta instalado
+    set /a PROGRAMAS_PULADOS+=1
     goto :eof
 )
-echo     [*] Instalando Office 365...
-REM Aqui viria o comando de instalacao do Office 365
+if not defined OFFICE_FILE (
+    for %%F in ("%PASTA_PROGRAMAS%\*office*") do if exist "%%F" set "OFFICE_FILE=%%F"
+)
+if not defined OFFICE_FILE (
+    echo     [X] Instalador do Office nao encontrado
+    goto :eof
+)
+echo     [*] Instalando Office 365: !OFFICE_FILE!
+start "" /wait "!OFFICE_FILE!" /configure configuration.xml
 echo     [+] Office 365 instalado com sucesso
+set /a PROGRAMAS_INSTALADOS+=1
 goto :eof
 
 :redes
@@ -343,6 +566,7 @@ echo  [3]  Gerenciador de dispositivos
 echo  [4]  Problemas de audio
 echo  [5]  Problemas de video
 echo  [6]  Drivers e hardware
+echo  [7]  NDD - Servidor de Impressao
 echo.
 echo  [0]  VOLTAR
 echo  ================================================================
@@ -355,11 +579,29 @@ if "%escolha%"=="3" goto gerenciador_dispositivos
 if "%escolha%"=="4" goto problemas_audio
 if "%escolha%"=="5" goto problemas_video
 if "%escolha%"=="6" goto drivers_hardware
+if "%escolha%"=="7" goto ndd_servidor
 if "%escolha%"=="0" goto menu
 
 echo.
 echo  [ERRO] Opcao invalida!
 timeout /t 2 >nul
+goto dispositivos
+
+:ndd_servidor
+cls
+echo.
+echo  ================================================================
+echo               NDD - ACESSO AO SERVIDOR DE IMPRESSAO
+echo  ================================================================
+echo.
+echo  [*] Abrindo servidor de impressao NDD...
+echo  [*] Caminho: \\prdprt-srv01
+echo.
+start explorer "\\prdprt-srv01"
+echo  [+] Servidor de impressao aberto!
+echo.
+echo  Pressione qualquer tecla para voltar...
+pause >nul
 goto dispositivos
 
 :correcao_impressao
