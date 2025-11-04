@@ -1,4 +1,4 @@
-# ERROR KILLER - Sistema de Suporte Técnico Diagonal
+# MENU - Sistema de Suporte Técnico Diagonal
 
 ## 📋 Sobre o Sistema
 
