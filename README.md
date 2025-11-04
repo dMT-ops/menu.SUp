@@ -1,6 +1,3 @@
-# menu.SUp
-menu de suporte
-
 # ERROR KILLER - Sistema de Suporte Técnico Diagonal
 
 ## 📋 Sobre o Sistema
