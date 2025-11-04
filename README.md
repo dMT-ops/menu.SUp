@@ -2,7 +2,7 @@
 
 ## 📋 Sobre o Sistema
 
-O **ERROR KILLER** é uma ferramenta completa de suporte técnico desenvolvida para a **Diagonal**, projetada para automatizar e simplificar as tarefas mais comuns de manutenção de computadores e solução de problemas.
+O **MENU** é uma ferramenta completa de suporte técnico desenvolvida para a **Diagonal**, projetada para automatizar e simplificar as tarefas mais comuns de manutenção de computadores e solução de problemas.
 
 ## 🚀 Funcionalidades Principais
 
