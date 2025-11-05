@@ -22,27 +22,443 @@ echo                       D I A G O N A L
 echo.
 echo  ================================================================
 echo.
-echo  [1]  INSTALAR PROGRAMAS
-echo  [2]  REDES
-echo  [3]  DISPOSITIVOS
-echo  [4]  GERENCIADOR DE TAREFAS
+echo  [1]  PADRONIZACAO DE MAQUINAS [PASSO A PASSO]
+echo  [2]  INSTALAR PROGRAMAS
+echo  [3]  REDES
+echo  [4]  DISPOSITIVOS
+echo  [5]  GERENCIADOR DE TAREFAS
 echo.
 echo  [S]  CONFIGURACOES DO SISTEMA
+echo  [A]  AJUDA E SUPORTE T.I
 echo  [0]  SAIR
 echo  ================================================================
 echo.
 set /p opcao= Comando: 
 
-if /i "%opcao%"=="1" goto programas
-if /i "%opcao%"=="2" goto redes
-if /i "%opcao%"=="3" goto dispositivos
-if /i "%opcao%"=="4" goto gerenciador
+if /i "%opcao%"=="1" goto padronizacao_passo_a_passo
+if /i "%opcao%"=="2" goto programas
+if /i "%opcao%"=="3" goto redes
+if /i "%opcao%"=="4" goto dispositivos
+if /i "%opcao%"=="5" goto gerenciador
 if /i "%opcao%"=="S" goto configuracoes
+if /i "%opcao%"=="A" goto ajuda
 if /i "%opcao%"=="0" goto fim
 
 echo.
 echo  [ERRO] Opcao invalida!
 timeout /t 2 >nul
+goto menu
+
+:padronizacao_passo_a_passo
+cls
+echo.
+echo  ================================================================
+echo               PADRONIZACAO DE MAQUINAS - PASSO A PASSO
+echo  ================================================================
+echo.
+echo  Este modulo ira guiar voce pelo processo completo de
+echo  padronizacao de uma nova maquina ou maquina em manutencao.
+echo.
+echo  [1] INICIAR PADRONIZACAO COMPLETA
+echo  [2] INGRESSAR EM DOMINIO
+echo  [3] INSTALACAO DE PROGRAMAS
+echo  [4] CONFIGURACOES BASICAS
+echo  [5] VERIFICAR STATUS DO DOMINIO
+echo.
+echo  [0] VOLTAR
+echo  ================================================================
+echo.
+set /p escolha= Selecione: 
+
+if "%escolha%"=="1" goto padronizacao_completa
+if "%escolha%"=="2" goto ingressar_dominio
+if "%escolha%"=="3" goto programas
+if "%escolha%"=="4" goto configuracoes_basicas
+if "%escolha%"=="5" goto status_dominio
+if "%escolha%"=="0" goto menu
+
+echo.
+echo  [ERRO] Opcao invalida!
+timeout /t 2 >nul
+goto padronizacao_passo_a_passo
+
+:padronizacao_completa
+cls
+echo.
+echo  ================================================================
+echo               PADRONIZACAO COMPLETA - INICIANDO
+echo  ================================================================
+echo.
+echo  [*] Iniciando processo de padronizacao completa...
+echo  [*] Este processo pode levar varios minutos.
+echo.
+echo  Pressione CTRL+C para cancelar a qualquer momento
+echo  ou aguarde 5 segundos para continuar...
+echo.
+timeout /t 5 >nul
+
+call :etapa_1_diagnostico
+call :etapa_2_ingressar_dominio
+call :etapa_3_instalar_programas
+call :etapa_4_configuracoes
+call :etapa_5_otimizacoes
+call :etapa_6_verificacao_final
+
+echo.
+echo  ================================================================
+echo               PADRONIZACAO COMPLETA - CONCLUIDA!
+echo  ================================================================
+echo.
+echo  [+] Todas as etapas foram concluidas com sucesso!
+echo  [*] A maquina esta padronizada e pronta para uso.
+echo.
+pause
+goto padronizacao_passo_a_passo
+
+:etapa_1_diagnostico
+echo.
+echo  ETAPA 1/6: DIAGNOSTICO INICIAL DO SISTEMA
+echo  -----------------------------------------
+systeminfo | findstr /C:"Nome do Sistema" /C:"Nome do Domínio" /C:"Total de Memória Física"
+echo.
+wmic computersystem get username
+echo.
+echo  [+] Diagnostico inicial concluido
+goto :eof
+
+:etapa_2_ingressar_dominio
+echo.
+echo  ETAPA 2/6: INGRESSAR EM DOMINIO
+echo  --------------------------------
+set /p dominio_temp= Digite o nome do dominio (ex: empresa.local): 
+if "!dominio_temp!"=="" (
+    echo  [!] Pulando ingresso em dominio
+    goto :eof
+)
+set "DOMINIO=!dominio_temp!"
+call :ingressar_dominio_interativo
+goto :eof
+
+:etapa_3_instalar_programas
+echo.
+echo  ETAPA 3/6: INSTALACAO DE PROGRAMAS
+echo  -----------------------------------
+echo  [*] Verificando instaladores na pasta: %PASTA_PROGRAMAS%
+if not exist "%PASTA_PROGRAMAS%" (
+    echo  [!] Pasta de programas nao encontrada. Pulando instalacao.
+    goto :eof
+)
+set /p instalar_programas= Deseja instalar todos os programas automaticamente? (S/N): 
+if /i "!instalar_programas!"=="S" (
+    call :instalar_todos
+) else (
+    echo  [!] Instalacao de programas pulada
+)
+goto :eof
+
+:etapa_4_configuracoes
+echo.
+echo  ETAPA 4/6: CONFIGURACOES BASICAS
+echo  --------------------------------
+echo  [*] Aplicando configuracoes padrao...
+call :configuracoes_basicas_auto
+echo  [+] Configuracoes basicas aplicadas
+goto :eof
+
+:etapa_5_otimizacoes
+echo.
+echo  ETAPA 5/6: OTIMIZACOES DO SISTEMA
+echo  ---------------------------------
+echo  [*] Aplicando otimizacoes...
+call :limpeza_sistema
+call :otimizacao_energia
+echo  [+] Otimizacoes aplicadas
+goto :eof
+
+:etapa_6_verificacao_final
+echo.
+echo  ETAPA 6/6: VERIFICACAO FINAL
+echo  ----------------------------
+echo  [*] Executando verificacoes finais...
+call :status_dominio_auto
+call :verificar_instalacoes
+call :gerar_relatorio_final
+echo  [+] Verificacao final concluida
+goto :eof
+
+:ingressar_dominio
+cls
+echo.
+echo  ================================================================
+echo                   INGRESSAR MAQUINA EM DOMINIO
+echo  ================================================================
+echo.
+set /p DOMINIO= Digite o nome do dominio (ex: empresa.local): 
+if "!DOMINIO!"=="" (
+    echo  [ERRO] Nome do dominio nao pode estar vazio!
+    timeout /t 2 >nul
+    goto ingressar_dominio
+)
+
+echo.
+echo  [*] Verificando conectividade com o dominio !DOMINIO!...
+ping !DOMINIO! -n 2 >nul
+if !errorlevel! neq 0 (
+    echo  [ERRO] Nao foi possivel contactar o dominio !DOMINIO!
+    echo  Verifique a conectividade de rede e tente novamente.
+    pause
+    goto padronizacao_passo_a_passo
+)
+
+echo  [+] Dominio !DOMINIO! contactado com sucesso!
+echo.
+
+:ingressar_dominio_interativo
+echo  [*] Preparando para ingressar no dominio...
+echo.
+echo  INSTRUCOES:
+echo  1. Digite um usuario com privilegios de dominio
+echo  2. Este usuario deve ter permissao para adicionar computadores ao dominio
+echo  3. A maquina sera reiniciada apos o ingresso
+echo.
+set /p USUARIO_DOMINIO= Usuario do dominio: 
+set /p SENHA_DOMINIO= Senha: 
+
+echo.
+echo  [*] Verificando credenciais...
+net use \\!DOMINIO! /user:!USUARIO_DOMINIO! !SENHA_DOMINIO! >nul 2>&1
+if !errorlevel! neq 0 (
+    echo  [ERRO] Credenciais invalidas ou usuario sem privilegios!
+    pause
+    goto ingressar_dominio
+)
+
+echo  [+] Credenciais validadas com sucesso!
+echo.
+echo  [*] Ingressando no dominio !DOMINIO!...
+echo  [*] Este processo pode levar alguns minutos...
+
+:: Ingredssar no dominio
+powershell -Command "Add-Computer -DomainName '!DOMINIO!' -Credential (New-Object System.Management.Automation.PSCredential('!USUARIO_DOMINIO!', (ConvertTo-SecureString '!SENHA_DOMINIO!' -AsPlainText -Force))) -Force -Restart" >nul 2>&1
+
+if !errorlevel! equ 0 (
+    echo  [+] Maquina ingressada no dominio com sucesso!
+    echo  [*] A maquina sera reiniciada automaticamente em 30 segundos...
+    echo.
+    echo  [IMPORTANTE] Apos o reinicio, faca login com usuario de dominio!
+    echo.
+    shutdown /r /t 30 /c "Reiniciando apos ingresso no dominio !DOMINIO!"
+    pause
+    exit
+) else (
+    echo  [ERRO] Falha ao ingressar no dominio!
+    echo  Possiveis causas:
+    echo   - Usuario sem privilegios suficientes
+    echo   - Problema de conectividade com o dominio
+    echo   - Nome de computador ja existe no dominio
+    echo   - Limite de computadores no dominio atingido
+    echo.
+    pause
+)
+
+goto padronizacao_passo_a_passo
+
+:status_dominio
+cls
+echo.
+echo  ================================================================
+echo                   STATUS DO DOMINIO
+echo  ================================================================
+echo.
+echo  [*] Verificando status do dominio...
+echo.
+
+systeminfo | findstr /C:"Nome do Domínio"
+
+echo.
+echo  [*] Informacoes de rede:
+ipconfig | findstr /C:"IPv4" /C:"Suffixo"
+
+echo.
+echo  [*] Testando conectividade com o controlador de dominio...
+nltest /dsgetdc:%userdnsdomain% >nul 2>&1
+if !errorlevel! equ 0 (
+    echo  [+] Conectado ao controlador de dominio
+    nltest /dsgetdc:%userdnsdomain%
+) else (
+    echo  [-] Nao conectado a um dominio
+)
+
+echo.
+echo  [*] Informacoes do computador no dominio:
+net config workstation
+
+echo.
+pause
+goto padronizacao_passo_a_passo
+
+:status_dominio_auto
+echo  [*] Verificando status do dominio...
+systeminfo | findstr /C:"Nome do Domínio" >nul
+if !errorlevel! equ 0 (
+    echo  [+] Computador esta em dominio
+) else (
+    echo  [-] Computador nao esta em dominio
+)
+goto :eof
+
+:configuracoes_basicas
+cls
+echo.
+echo  ================================================================
+echo                   CONFIGURACOES BASICAS
+echo  ================================================================
+echo.
+echo  [1] CONFIGURAR NOME DO COMPUTADOR
+echo  [2] CONFIGURAR GRUPO DE TRABALHO
+echo  [3] CONFIGURACOES DE REDE
+echo  [4] CONFIGURACOES DE ENERGY
+echo  [5] CONFIGURACOES DE UPDATE
+echo.
+echo  [A] APLICAR TODAS AS CONFIGURACOES PADRAO
+echo  [0] VOLTAR
+echo  ================================================================
+echo.
+set /p escolha= Selecione: 
+
+if "%escolha%"=="1" goto configurar_nome_computador
+if "%escolha%"=="2" goto configurar_grupo_trabalho
+if "%escolha%"=="3" goto configurar_rede
+if "%escolha%"=="4" goto configurar_energy
+if "%escolha%"=="5" goto configurar_update
+if /i "%escolha%"=="A" goto configuracoes_basicas_auto
+if "%escolha%"=="0" goto padronizacao_passo_a_passo
+
+echo.
+echo  [ERRO] Opcao invalida!
+timeout /t 2 >nul
+goto configuracoes_basicas
+
+:configuracoes_basicas_auto
+echo  [*] Aplicando configuracoes padrao automaticamente...
+echo  [*] Desativando hibernacao...
+powercfg -h off
+echo  [*] Configurando esquema de energia alto desempenho...
+powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+echo  [*] Configurando updates automaticos...
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v NoAutoUpdate /t REG_DWORD /d 0 /f >nul
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v AUOptions /t REG_DWORD /d 4 /f >nul
+echo  [+] Configuracoes padrao aplicadas
+goto :eof
+
+:configurar_nome_computador
+echo.
+set /p novo_nome= Digite o novo nome do computador: 
+if not "!novo_nome!"=="" (
+    WMIC computersystem where caption="%computername%" rename "!novo_nome!" >nul
+    echo  [+] Nome do computador alterado para: !novo_nome!
+    echo  [*] Reinicie o computador para aplicar a alteracao
+)
+pause
+goto configuracoes_basicas
+
+:configurar_grupo_trabalho
+echo.
+set /p novo_grupo= Digite o nome do grupo de trabalho: 
+if not "!novo_grupo!"=="" (
+    WMIC computersystem where name="%computername%" set workgroup="!novo_grupo!" >nul
+    echo  [+] Grupo de trabalho alterado para: !novo_grupo!
+    echo  [*] Reinicie o computador para aplicar a alteracao
+)
+pause
+goto configuracoes_basicas
+
+:configurar_rede
+echo.
+echo  [*] Abrindo configuracoes de rede...
+start ncpa.cpl
+timeout /t 2 >nul
+goto configuracoes_basicas
+
+:configurar_energy
+echo.
+echo  [*] Abrindo opcoes de energia...
+start powercfg.cpl
+timeout /t 2 >nul
+goto configuracoes_basicas
+
+:configurar_update
+echo.
+echo  [*] Abrindo configuracoes de update...
+start ms-settings:windowsupdate
+timeout /t 2 >nul
+goto configuracoes_basicas
+
+:verificar_instalacoes
+echo  [*] Verificando programas instalados...
+where chrome >nul 2>&1 && echo  [+] Google Chrome - Instalado || echo  [-] Google Chrome - Ausente
+where teams >nul 2>&1 && echo  [+] Microsoft Teams - Instalado || echo  [-] Microsoft Teams - Ausente
+where anydesk >nul 2>&1 && echo  [+] AnyDesk - Instalado || echo  [-] AnyDesk - Ausente
+goto :eof
+
+:gerar_relatorio_final
+set "RELATORIO_FINAL=%TEMP%\relatorio_padronizacao_%datetime:~0,8%.txt"
+echo Relatorio de Padronizacao > "!RELATORIO_FINAL!"
+echo Data: %date% %time% >> "!RELATORIO_FINAL!"
+echo. >> "!RELATORIO_FINAL!"
+systeminfo >> "!RELATORIO_FINAL!"
+echo. >> "!RELATORIO_FINAL!"
+echo Programas Instalados: >> "!RELATORIO_FINAL!"
+where chrome >nul 2>&1 && echo Google Chrome: SIM >> "!RELATORIO_FINAL!" || echo Google Chrome: NAO >> "!RELATORIO_FINAL!"
+where teams >nul 2>&1 && echo Microsoft Teams: SIM >> "!RELATORIO_FINAL!" || echo Microsoft Teams: NAO >> "!RELATORIO_FINAL!"
+echo. >> "!RELATORIO_FINAL!"
+echo [+] Relatorio salvo em: !RELATORIO_FINAL!
+goto :eof
+
+:limpeza_sistema
+echo  [*] Executando limpeza do sistema...
+cleanmgr /sagerun:1 >nul 2>&1
+echo  [+] Limpeza do sistema concluida
+goto :eof
+
+:otimizacao_energia
+echo  [*] Aplicando otimizacoes de energia...
+powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1
+powercfg -h off >nul 2>&1
+echo  [+] Otimizacoes de energia aplicadas
+goto :eof
+
+:ajuda
+cls
+echo.
+echo  ================================================================
+echo                      AJUDA E SUPORTE T.I
+echo  ================================================================
+echo.
+echo  [INFORMACOES DE CONTATO]
+echo.
+echo  Telefone do Suporte: (11) 9999-9999
+echo  Email: suporte@empresa.com.br
+echo  Chat: http://suporte.empresa.com.br
+echo  Site: http://www.empresa.com.br/ti
+echo.
+echo  [HORARIO DE ATENDIMENTO]
+echo  Segunda a Sexta: 8h as 18h
+echo  Sabado: 8h as 12h
+echo.
+echo  [PROCEDIMENTOS URGENTES]
+echo  1. Problemas de rede: Contate a infraestrutura
+echo  2. Problemas de login: Verifique dominio e senha
+echo  3. Equipamento danificado: Abra chamado urgente
+echo.
+echo  [AREA RESPONSAVEL]
+echo  ^> Suporte Tecnico N1: Problemas basicos
+echo  ^> Infraestrutura: Rede, servidores, dominio
+echo  ^> Desenvolvimento: Sistemas internos
+echo.
+echo  ================================================================
+echo.
+pause
 goto menu
 
 :programas
@@ -978,7 +1394,7 @@ echo  [2] Configuracoes do Windows
 echo  [3] Painel de controle
 echo  [4] Gerenciador de dispositivos
 echo  [5] Gerenciador de discos
-echo  [0] Voltar
+echo  [0] VOLTAR
 echo  ==================================
 echo.
 set /p escolha= Selecione: 
