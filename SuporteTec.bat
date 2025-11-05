@@ -18,7 +18,7 @@ cls
 echo.
 echo  ================================================================
 echo.
-echo                    D I A G O N A L
+echo                       D I A G O N A L
 echo.
 echo  ================================================================
 echo.
@@ -128,11 +128,17 @@ set "ENCONTRADOS=0"
 echo  Procurando instaladores...
 echo.
 
-:: Procura por arquivos comuns de instalacao
-for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" (
-    echo  [✓] Parallels: %%~nxF
-    set "PARALLELS_FILE=%%F"
+:: Procura por arquivos comuns de instalacao - MODIFICADO PARA PARALLELS
+if exist "%PASTA_PROGRAMAS%\2xclient-x64.msi" (
+    echo  [✓] Parallels: 2xclient-x64.msi
+    set "PARALLELS_FILE=%PASTA_PROGRAMAS%\2xclient-x64.msi"
     set /a ENCONTRADOS+=1
+) else (
+    for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" (
+        echo  [✓] Parallels: %%~nxF
+        set "PARALLELS_FILE=%%F"
+        set /a ENCONTRADOS+=1
+    )
 )
 for %%F in ("%PASTA_PROGRAMAS%\*chrome*") do if exist "%%F" (
     echo  [✓] Chrome: %%~nxF
@@ -245,7 +251,12 @@ if %errorlevel% equ 0 (
     goto :eof
 )
 if not defined PARALLELS_FILE (
-    for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" set "PARALLELS_FILE=%%F"
+    :: PRIMEIRO BUSCA PELO NOME ESPECÍFICO, DEPOIS POR PARALLELS
+    if exist "%PASTA_PROGRAMAS%\2xclient-x64.msi" (
+        set "PARALLELS_FILE=%PASTA_PROGRAMAS%\2xclient-x64.msi"
+    ) else (
+        for %%F in ("%PASTA_PROGRAMAS%\*parallels*") do if exist "%%F" set "PARALLELS_FILE=%%F"
+    )
 )
 if not defined PARALLELS_FILE (
     echo     [X] Instalador do Parallels nao encontrado
