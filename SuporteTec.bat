@@ -1449,7 +1449,7 @@ goto :eof
 cls
 echo.
 echo  ================================================================
-echo   Obrigado por usar o ERROR KILLER - DIAGONAL!
+echo   Obrigado por usar o MENU DE SUPORTE - DIAGONAL!
 echo  ================================================================
 echo.
 timeout /t 3 >nul
