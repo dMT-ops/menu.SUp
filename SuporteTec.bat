@@ -437,10 +437,10 @@ echo  ================================================================
 echo.
 echo  [INFORMACOES DE CONTATO]
 echo.
-echo  Telefone do Suporte: (11) 9999-9999
-echo  Email: suporte@empresa.com.br
-echo  Chat: http://suporte.empresa.com.br
-echo  Site: http://www.empresa.com.br/ti
+echo  Telefone do Suporte: (11) 3292-1504
+echo  Email: diagonal@desk.ms
+echo  Chat: https://diagonal.desk.ms
+echo  Site: https://diagonal.desk.ms
 echo.
 echo  [HORARIO DE ATENDIMENTO]
 echo  Segunda a Sexta: 8h as 18h
@@ -1454,3 +1454,4 @@ echo  ================================================================
 echo.
 timeout /t 3 >nul
 exit
+
